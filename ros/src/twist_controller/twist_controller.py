@@ -36,44 +36,41 @@ class Controller(object):
 
         self.last_time = rospy.get_time()
 
-        self.yaw_controller = Yaw
-
     def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
         # TODO: Change the arg, kwarg list to suit your needs
         # Return throttle, brake, steer
         # return 1., 0., 0. just for hard code control here to make car run!
         
         if not dbw_enabled:
-        	self.throttle_controller.reset()
-        	return 0., 0., 0.
+            self.throttle_controller.reset()
+            return 0., 0., 0.
 
-        # just to filter out noise from current velocity
-		current_vel = self.vel_lpf.filt(current_vel)        	 
+        #just to filter out noise from current velocity
+        current_vel = self.vel_lpf.filt(current_vel)
         
         # rospy.logwarn("Angular vel: {0}".format(angular_vel))
         # rospy.logwarn("Target vel: {0}".format(linear_vel))
         # rospy.logwarn("Target angular vel: {0}".format(angular_vel))
         # rospy.logwarn("Current vel: {0}".format(current_vel))
         # rospy.logwarn("Filter vel: {0}".format(self.vel_lpf.get()))
-        
-       	steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+        steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
-       	vel_error = linear_vel - current_vel
-       	self.last_vel = current_vel
+        vel_error = linear_vel - current_vel
+        self.last_vel = current_vel
 
-       	current_time = rospy.get_time()
-       	sample_time = current_time - self.last_time
-       	self.last_time = current_time
+        current_time = rospy.get_time()
+        sample_time = current_time - self.last_time
+        self.last_time = current_time
 
-       	thottle = self.throttle_controller.step(vel_error, sample_time)
-       	brake = 0
+        throttle = self.throttle_controller.step(vel_error, sample_time)
+        brake = 0
 
-       	if linear_vel == 0 and current_vel < 0.1:
-       		throttle = 0
-       		brake = 400 #torque N*m Acceleration - 1m/s^2
-		elif throttle < 0.1 and vel_error < 0:
-			throttle = 0
-			decel = max(vel_error, self.decel_limit)
-			brake = abs(decel) * self.vehicle_mass*self.wheel_radius # torgue N*m
+        if linear_vel == 0 and current_vel < 0.1:
+            throttle = 0
+            brake = 400 #torque N*m Acceleration - 1m/s^2
+        elif throttle < 0.1 and vel_error < 0:
+            throttle = 0
+            decel = max(vel_error, self.decel_limit)
+            brake = abs(decel) * self.vehicle_mass*self.wheel_radius # torgue N*m
 
-		return throttle, brake, steering			       		
+        return throttle, brake, steering

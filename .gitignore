@@ -6,3 +6,6 @@ devel
 profile.tmp
 
 .vscode
+
+#nohup if any
+**/nohup.out

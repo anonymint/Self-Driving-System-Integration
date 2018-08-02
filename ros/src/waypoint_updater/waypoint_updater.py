@@ -43,6 +43,7 @@ class WaypointUpdater(object):
         # TODO: Add other member variables you need below
         self.pose = None
         self.base_waypoints = None
+        self.stopline_wp_idx = -1
         self.waypoints_2d = None
         self.waypoints_tree = None
 
@@ -103,6 +104,8 @@ class WaypointUpdater(object):
             lane.waypoints = base_waypoints
         else:
             lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
+
+        return lane
 
     def decelerate_waypoints(self, waypoints, closest_idx):
         temp = []
